@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<canvas id="canvas1" width="800" height="600"></canvas>
+		<!--
+			1：表盘
+			2：刻度
+			3：指针
+			4：获取时间
+			
+			获取时间，重新绘制：每隔1秒钟绘制：
+		-->
+		<script type="text/javascript">
+			var canvas1 = document.querySelector('#canvas1')
+			var ctx = canvas1.getContext('2d')
+			
+			
+			
+			function drawTime(){
+				//清盘
+				ctx.clearRect(0,0,800,600)
+				
+				//表盘
+				ctx.beginPath()
+				ctx.arc(400,300,200,0,2*Math.PI)
+				ctx.lineWidth = 10 
+				ctx.strokeStyle = 'grey'
+				ctx.stroke()
+				ctx.closePath()
+				
+				ctx.save()//保留这个坐标系的位置，以及保留ctx的属性样式
+				//刻度
+				ctx.translate(400,300)
+				
+				ctx.save()//保留了移动后的坐标原点为400，300像素位置的坐标系
+				
+				//分针的刻度
+				for(var i = 0; i< 60;i++){
+					ctx.beginPath()
+					//移动坐标系
+					//有60个刻度，所以每一次旋转360(2*Math.pi)/60
+					//第一次就转了
+					ctx.rotate(2*Math.PI/60)
+					ctx.moveTo(170,0)
+					ctx.lineTo(190,0)
+					ctx.lineWidth = 5
+					ctx.strokeStyle = '#aaa'
+					ctx.stroke()
+					
+					ctx.closePath()
+				}
+				
+				ctx.restore()//恢复到没有旋转前，恢复到坐标系为400，300像素位置的坐标系
+				
+				ctx.save()
+				//时钟的刻度
+				for(var i = 0; i< 12;i++){
+					ctx.beginPath()
+					//移动坐标系
+					//有60个刻度，所以每一次旋转360(2*Math.pi)/60
+					ctx.rotate(2*Math.PI/12)
+					ctx.moveTo(165,0)
+					ctx.lineTo(190,0)
+					ctx.lineWidth = 10
+					ctx.strokeStyle = '#333'
+					ctx.stroke()
+					
+					ctx.closePath()
+				}
+				ctx.restore()
+				ctx.save()
+				
+				
+				//获取时间
+				var nowTime = new Date()
+	//			console.log(nowTime)
+				//获取小时
+				var hour = nowTime.getHours()
+				//获取分
+				var min = nowTime.getMinutes()
+				//获取秒
+				var sec = nowTime.getSeconds()
+				
+				if(hour>=12){
+					hour = hour-12
+				}
+				console.log(hour,min,sec)
+				
+				//将坐标系逆时针旋转90
+				ctx.rotate(-2*Math.PI/4)
+				ctx.save()
+				
+				//首先绘制秒针
+				ctx.beginPath()
+				
+				ctx.rotate(2*Math.PI/60*sec)
+				ctx.moveTo(-20,0)
+				ctx.lineTo(150,0)
+				ctx.lineWidth = 3
+				ctx.strokeStyle = 'red'
+				ctx.stroke()
+				ctx.closePath()
+				
+				ctx.restore()
+				ctx.save()
+				
+				//绘制分针
+				ctx.beginPath()
+				
+				ctx.rotate(2*Math.PI/60*min + 2*Math.PI/60*sec/60)
+				ctx.moveTo(-15,0)
+				ctx.lineTo(140,0)
+				ctx.lineWidth = 5
+				ctx.strokeStyle = 'darkslategray'
+				ctx.stroke()
+				ctx.closePath()
+				
+				ctx.restore()
+				
+				ctx.save()
+				
+				
+				//绘制时针
+				ctx.beginPath()
+				
+				ctx.rotate(2*Math.PI/12*hour+2*Math.PI/12*min/60+ 2*Math.PI/12/60*sec/60)
+				ctx.moveTo(-10,0)
+				ctx.lineTo(100,0)
+				ctx.lineWidth = 10
+				ctx.strokeStyle = 'darkslategray'
+				ctx.stroke()
+				ctx.closePath()
+				
+				ctx.restore()
+				
+				ctx.restore()
+				ctx.restore()
+				
+				requestAnimationFrame(drawTime)
+			}
+			
+			
+			
+			
+			//这是第一种画动画的方式
+//			setInterval(function(){
+//				drawTime()
+//			},20)
+			
+			//尽最大能力去渲染，也可以保证不卡帧，请求动画帧的方法。
+			requestAnimationFrame(drawTime)
+			
+			
+			
+			
+			
+		</script>
+	</body>
+</html>
